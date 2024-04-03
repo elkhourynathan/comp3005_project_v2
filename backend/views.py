@@ -75,10 +75,23 @@ def member_home():
     # Traier availabilities
     availabilities = Availability.query.all()
 
+    # Query based off the availability trainer_id name to get the matching trainer name from Trainers
+    for availability in availabilities:
+        trainer = Trainer.query.filter_by(id=availability.trainer_id).first()
+        availability.trainer_name = trainer.name
+
     # Class schedules
     classes = Classes.query.all()
 
-    return render_template("member_home.html", user=current_user, availabilities=availabilities, classes=classes)
+    # Query Sessions and filter by member_id
+    sessions = Sessions.query.filter_by(member_id=current_user.id).all()
+
+    # Query based off the session trainer_id name to get the matching trainer name from Trainers
+    for session in sessions:
+        trainer = Trainer.query.filter_by(id=session.trainer_id).first()
+        session.trainer_name = trainer.name
+
+    return render_template("member_home.html", user=current_user, availabilities=availabilities, classes=classes, sessions=sessions)
 
 @views.route('/member_home/update_profile', methods=['POST'])
 @login_required

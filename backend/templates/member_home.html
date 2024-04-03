@@ -74,7 +74,7 @@
     <h3> Available Trainers</h3>
     <ul>
       {% for availability in availabilities %}
-        <li>Trainer ID: {{ availability.trainer_id }}, Available: {{ availability.available_start }} to {{ availability.available_end }}</li>
+        <li>Trainer ID: {{ availability.trainer_id }}, Trainer Name: {{ availability.trainer_name }}, Available: {{ availability.available_start }} to {{ availability.available_end }}</li>
       {% endfor %}
   </div>
   <div class="col-md-6">
@@ -82,9 +82,10 @@
     <form method="POST" action="/member_home/book_session">
       <label for="trainer_id">Trainer ID: </label>
       <input type="text" id="trainer_id" name="trainer_id" value="">
+      <br>
       <label for="date">Time:</label>
       <input type="datetime-local" id="date" name="date">
-      <!-- label and inputs for credit card info below -->
+      <br>
       <label for="credit_card_number">Credit Card Number:</label>
       <input type="text" id="credit_card_number" name="credit_card_number">
       <label for="amount"> Cost: $50</label>
@@ -103,6 +104,19 @@
   </div>
   <div class="col-md-6">
     <h3>Book a Class</h3>
+  </div>
+</div>
+<br>
+<div class="row">
+
+  <div class="col-md-6">
+    <h3> Booked Sessions</h3>
+    {% for session in sessions %}
+    <li>Trainer ID: {{ session.trainer_id }}, Trainer Name: {{ session.trainer_name }}, Start Time: {{ session.date_time}}</li>
+    {% endfor %}
+  </div>
+  <div class="col-md-6">
+    <h3>Booked Classes</h3>
   </div>
 </div>
 {% endblock%}

@@ -50,9 +50,17 @@ CREATE TABLE Admin (
 -- Create the Class table
 CREATE TABLE Classes (
     id SERIAL PRIMARY KEY,
+    trainer_id INT REFERENCES Trainer(id),
     name VARCHAR(255),
     room VARCHAR(255),
     schedule TIMESTAMP
+);
+
+-- Create the MemberClasses table
+CREATE TABLE MemberClasses (
+    id SERIAL PRIMARY KEY,
+    member_id INT REFERENCES Member(id),
+    class_id INT REFERENCES Classes(id),
 );
 
 -- Create the Sessions table
@@ -61,6 +69,7 @@ CREATE TABLE Sessions (
     member_id INT REFERENCES Member(id),
     trainer_id INT REFERENCES Trainer(id),
     date_time TIMESTAMP
+    routine_id INT REFERENCES Routine(id)
 );
 
 -- Create the Equipment table

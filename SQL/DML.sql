@@ -22,9 +22,9 @@ INSERT INTO Availability (trainer_id, available_start, available_end) VALUES
 (2, '2024-04-01 08:00:00', '2024-04-01 11:00:00');
 
 -- Inserting Classes
-INSERT INTO Classes (name, room, schedule) VALUES
-('Yoga Basics', 'Room A', '2024-04-03 10:00:00'),
-('Advanced Cardio', 'Room B', '2024-04-04 08:00:00');
+INSERT INTO Classes (name, trainer_id, room, schedule) VALUES
+('Yoga Basics', 1, 'Room A', '2024-04-05 10:00:00'),
+('Advanced Cardio', 1, 'Room B', '2024-04-06 08:00:00');
 
 -- Inserting Sessions (assume MemberID 1 is John Doe, TrainerID 1 is Tom Smith)
 -- INSERT INTO Sessions (member_id, trainer_id, date_time) VALUES

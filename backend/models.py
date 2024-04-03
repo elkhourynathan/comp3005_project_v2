@@ -47,13 +47,13 @@ class Admin(db.Model, UserMixin):
     def get_id(self):
         return self.username
 
-class Class(db.Model):
+class Classes(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
     room = db.Column(db.String(255))
     schedule = db.Column(db.DateTime)
 
-class Session(db.Model):
+class Sessions(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     member_id = db.Column(db.Integer, db.ForeignKey('member.id'))
     trainer_id = db.Column(db.Integer, db.ForeignKey('trainer.id'))

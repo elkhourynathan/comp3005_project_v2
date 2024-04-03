@@ -27,9 +27,9 @@ INSERT INTO Classes (name, room, schedule) VALUES
 ('Advanced Cardio', 'Room B', '2024-04-04 08:00:00');
 
 -- Inserting Sessions (assume MemberID 1 is John Doe, TrainerID 1 is Tom Smith)
-INSERT INTO Sessions (member_id, trainer_id, date_time) VALUES
-(1, 1, '2024-04-01 10:00:00'),
-(1, 1, '2024-04-02 15:00:00');
+-- INSERT INTO Sessions (member_id, trainer_id, date_time) VALUES
+-- (1, 1, '2024-04-01 10:00:00'),
+-- (1, 1, '2024-04-02 15:00:00');
 
 -- Inserting Equipment
 INSERT INTO Equipment (type, maintenance_schedule) VALUES
@@ -37,9 +37,9 @@ INSERT INTO Equipment (type, maintenance_schedule) VALUES
 ('Rowing Machine', '2024-05-15');
 
 -- Inserting Bills for John Doe
-INSERT INTO Bill (member_id, amount, date) VALUES
-(1, 100.00, '2024-03-01'),
-(1, 150.00, '2024-04-01');
+-- INSERT INTO Bill (member_id, amount, date) VALUES
+-- (1, 100.00, '2024-03-01'),
+-- (1, 150.00, '2024-04-01');
 
 -- Inserting Routines for John Doe
 INSERT INTO Routine (member_id, type, date) VALUES

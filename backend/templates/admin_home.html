@@ -1,8 +1,291 @@
-{% extends 'base.html' %} {% block title %} Home {% endblock %} {% block content
-    %}
-      <h1 class="text-center">Admin Dashboard</h1>
-      <div class="messages">
-        <h2>Hello {{ user.name }} {{ user.username }}</h2>
-      </div>
-    {% endblock%}
-    
+{% extends 'base.html' %} {% block title %} Admin Dashboard {% endblock %} {%
+block content %}
+<div class="container">
+  <h1 class="text-center">Admin Dashboard</h1>
+  <div class="row">
+    <h3>Maintenance</h3>
+    <div class="col-12">
+      <form method="POST" action="{{ url_for('admin.update_maintenance') }}">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Equipment ID</th>
+              <th scope="col">Type</th>
+              <th scope="col">Last Maintained</th>
+              <th scope="col">Next Maintenance</th>
+              <th scope="col">Maintain</th>
+              <th scope="col">Edit</th>
+              <th scope="col">Remove</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for equipment in all_equipment %}
+            <tr>
+              <td>
+                <input
+                  type="text"
+                  name="equipment_id"
+                  value="{{ equipment.id }}"
+                  readonly
+                  hidden
+                />
+                {{ equipment.id }}
+              </td>
+
+              <td>
+                <input
+                  type="text"
+                  name="equipment_type"
+                  value="{{ equipment.type }}"
+                />
+              </td>
+              <td>
+                <input
+                  type="datetime-local"
+                  name="last_maintained"
+                  value="{{ equipment.last_maintained }}"
+                />
+              </td>
+              <td>
+                <input
+                  type="datetime-local"
+                  name="next_maintenance"
+                  value="{{ equipment.next_maintenance }}"
+                />
+              </td>
+              <td>
+                <button
+                  type="submit"
+                  formaction="{{ url_for('admin.maintain_equipment', equipment_id=equipment.id) }}"
+                  class="btn btn-primary"
+                >
+                  Maintain
+                </button>
+              </td>
+              <td>
+                <button
+                  type="submit"
+                  formaction="{{ url_for('admin.update_maintenance', equipment_id=equipment.id) }}"
+                  class="btn btn-primary"
+                >
+                  Edit
+                </button>
+              </td>
+              <td>
+                <button
+                  type="submit"
+                  formaction="{{ url_for('admin.delete_equipment', equipment_id=equipment.id) }}"
+                  class="btn btn-danger"
+                >
+                  Remove
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+            <tr>
+              <td>
+                <p></p>
+              </td>
+              <td>
+                <input type="text" name="new_type" />
+              </td>
+              <td>
+                <p></p>
+              </td>
+              <td>
+                <input type="date" name="new_next_maintenance" />
+              </td>
+              <td>
+                <button
+                  type="submit"
+                  formaction="{{ url_for('admin.add_equipment') }}"
+                  class="btn btn-success"
+                >
+                  Add
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+    </div>
+    <h3>Class Scheduling</h3>
+    <div class="col-12">
+      <form method="POST" action="{{ url_for('admin.update_class_schedule') }}">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Trainer Name</th>
+              <th scope="col">Name</th>
+              <th scope="col">Room</th>
+              <th scope="col">Schedule</th>
+              <th scope="col">Edit</th>
+              <th scope="col">Remove</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for class in classes %}
+            <tr>
+              <td>
+                <input
+                  type="text"
+                  name="class_id"
+                  value="{{ class.id }}"
+                  readonly
+                  hidden
+                />
+                {{ class.id }}
+              </td>
+              <td>
+                <select name="trainer_id" class="form-control">
+                  {% for trainer in trainers %}
+                  <option value="{{ trainer.id }}">{{ trainer.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <input type="text" name="class_name" value="{{ class.name }}" />
+              </td>
+              <td>
+                <input type="text" name="class_room" value="{{ class.room }}" />
+              </td>
+              <td>
+                <input
+                  type="datetime-local"
+                  name="class_schedule"
+                  value="{{ class.schedule }}"
+                />
+              </td>
+              <td>
+                <button
+                  type="submit"
+                  formaction="{{ url_for('admin.update_class_schedule', class_schedule_id=class.id) }}"
+                  class="btn btn-primary"
+                >
+                  Edit
+                </button>
+              </td>
+              <td>
+                <button
+                  type="submit"
+                  formaction="{{ url_for('admin.delete_class_schedule', class_schedule_id=class.id) }}"
+                  class="btn btn-danger"
+                >
+                  Remove
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+            <tr>
+              <td></td>
+              <td>
+                <select name="new_trainer_id" class="form-control">
+                  {% for trainer in trainers %}
+                  <option value="{{ trainer.id }}">{{ trainer.name }}</option>
+                  {% endfor %}
+                </select>
+              <td>
+                <input type="text" name="new_class_name" />
+              </td>
+              <td>
+                <input type="text" name="new_room" />
+              </td>
+              <td>
+                <input type="datetime-local" name="new_schedule" />
+              </td>
+              <td>
+                <button
+                  type="submit"
+                  formaction="{{ url_for('admin.add_class_schedule') }}"
+                  class="btn btn-success"
+                >
+                  Add
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+    </div>
+    <h3>Billing</h3>
+    <div class="col-12">
+      <form method="POST" action="{{ url_for('admin.add_bill') }}">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Member Name</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Type</th>
+            <th scope="col">Date</th>
+            <th scope="col">Paid</th>
+            <th scope="col">Process Payment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <input type="text" name="new_member_id" placeholder="Member ID" />
+            </td>
+            <td>
+              <input type="text" name="new_member_name" placeholder="Member Name" />
+            </td>
+            <td>
+              <input type="number" name="new_amount" placeholder="Amount" />
+            </td>
+            <td>
+              <input type="text" name="new_type" placeholder="Type" />
+            </td>
+            <td>
+              <input type="date" name="new_date" placeholder="Date" />
+            </td>
+            <td>
+              <input type="checkbox" name="new_paid" />
+            </td>
+            <td>
+              <button type="submit" class="btn btn-success">Add Bill</button>
+            </td>
+          </tr>
+          {% for bill in bills %}
+          <tr>
+            <td>{{ bill.id }}</td>
+            <td>{{ bill.member_name }}</td>
+            <td>{{ bill.amount }}</td>
+            <td>{{ bill.type }}</td>
+            <td>{{ bill.date }}</td>
+            <td> {{ bill.paid }} </td>
+            {% if bill.paid == False %}
+            <td>
+              <button
+                type="submit"
+                formaction="{{ url_for('admin.pay_bill', bill_id=bill.id) }}"
+                class="btn btn-primary"
+              >
+                Process Payment
+              </button>
+            </td>
+            {% else %}
+            <td>
+              <p>Payment Processed</p>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  window.addEventListener('keydown', function(e) {
+    if (e.keyIdentifier == 'U+000A' || e.keyIdentifier == 'Enter' || e.keyCode == 13) {
+      if (e.target.nodeName == 'INPUT' && e.target.type != 'textarea') {
+        e.preventDefault();
+        return false;
+      }
+    }
+  }, true);
+</script>
+{% endblock %}

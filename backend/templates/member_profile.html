@@ -1,0 +1,51 @@
+{% extends 'base.html' %} 
+{% block title %} Home {% endblock %} 
+{% block content %}
+
+<h1 class="mb-4 text-center">Profile Information</h1>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm p-3 mb-5 bg-white rounded">
+        <div class="card-body">
+          <form method="POST" action="/member_home/update_profile">
+            <div class="mb-3">
+              <label for="name" class="form-label">Name:</label>
+              <input type="text" class="form-control" id="name" name="name" value="{{ user.name }}">
+            </div>
+            <div class="mb-3">
+              <label for="profile_info" class="form-label">Profile Info:</label>
+              <input type="text" class="form-control" id="profile_info" name="profile_info" value="{{ user.profile_info }}">
+            </div>
+            <div class="mb-3">
+              <label for="fitness_goals" class="form-label">Fitness Goals:</label>
+              <input type="text" class="form-control" id="fitness_goals" name="fitness_goals" value="{{ user.fitness_goals }}">
+            </div>
+            <div class="mb-3">
+              <label for="health_metrics" class="form-label">Health Metrics:</label>
+              <input type="text" class="form-control" id="health_metrics" name="health_metrics" value="{{ user.health_metrics }}">
+            </div>
+            <div class="mb-3">
+              <label for="height" class="form-label">Height (cm):</label>
+              <input type="text" class="form-control" id="height" name="height" value="{{ user.height }}">
+            </div>
+            <div class="mb-3">
+              <label for="weight" class="form-label">Weight (kg):</label>
+              <input type="text" class="form-control" id="weight" name="weight" value="{{ user.weight }}">
+            </div>
+            <div class="mb-3">
+              <label for="goal_weight" class="form-label">Goal Weight:</label>
+              <input type="text" class="form-control" id="goal_weight" name="goal_weight" value="{{ user.goal_weight }}">
+            </div>
+            <div class="mb-3">
+              <label for="goal_workouts_per_week" class="form-label">Goal Workouts Per Week:</label>
+              <input type="text" class="form-control" id="goal_workouts_per_week" name="goal_workouts_per_week" value="{{ user.goal_workouts_per_week }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Update Profile</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock%}

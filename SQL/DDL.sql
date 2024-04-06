@@ -1,5 +1,5 @@
 -- Create the Member table
-DROP TABLE IF EXISTS Bill, Sessions, Classes, Admin, Equipment, Availability, Trainer, Routine, Member CASCADE;
+DROP TABLE IF EXISTS Bill, Sessions, Classes, Admin,Member_Classes, Equipment, Availability, Trainer, Routine, Member CASCADE;
 CREATE TABLE Member (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) UNIQUE NOT NULL,
@@ -56,11 +56,11 @@ CREATE TABLE Classes (
     schedule TIMESTAMP
 );
 
--- Create the MemberClasses table
-CREATE TABLE MemberClasses (
+-- Create the Member_Classes table
+CREATE TABLE Member_Classes (
     id SERIAL PRIMARY KEY,
     member_id INT REFERENCES Member(id),
-    class_id INT REFERENCES Classes(id),
+    class_id INT REFERENCES Classes(id)
 );
 
 -- Create the Sessions table
@@ -68,15 +68,16 @@ CREATE TABLE Sessions (
     id SERIAL PRIMARY KEY,
     member_id INT REFERENCES Member(id),
     trainer_id INT REFERENCES Trainer(id),
-    date_time TIMESTAMP
+    date_time TIMESTAMP,
     routine_id INT REFERENCES Routine(id)
 );
 
 -- Create the Equipment table
 CREATE TABLE Equipment (
-    equipment_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     type VARCHAR(255),
-    maintenance_schedule TIMESTAMP
+    last_maintained TIMESTAMP,
+    next_maintenance TIMESTAMP
 );
 
 -- Create the Bill table
@@ -84,5 +85,7 @@ CREATE TABLE Bill (
     id SERIAL PRIMARY KEY,
     member_id INT REFERENCES Member(id),
     amount DECIMAL(10, 2),
+    paid BOOLEAN,
+    type VARCHAR(255),
     date TIMESTAMP
 );

@@ -23,11 +23,11 @@ def login():
                 flash('Logged in successfully!', category='success')
                 login_user(user, remember=False)
                 if isinstance(user, Member):
-                    return redirect(url_for('views.member_home'))
+                    return redirect(url_for('member.member_home'))
                 elif isinstance(user, Trainer):
-                    return redirect(url_for('views.trainer_home'))
+                    return redirect(url_for('trainer.trainer_home'))
                 else:  # user is an Admin
-                    return redirect(url_for('views.admin_home'))
+                    return redirect(url_for('admin.admin_home'))
             else:
                 flash('Incorrect password, try again.', category='error')
         else:

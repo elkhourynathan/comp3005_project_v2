@@ -49,9 +49,15 @@ class Admin(db.Model, UserMixin):
 
 class Classes(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    trainer_id = db.Column(db.Integer, db.ForeignKey('trainer.id'))
     name = db.Column(db.String(255))
     room = db.Column(db.String(255))
     schedule = db.Column(db.DateTime)
+
+class MemberClasses (db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    member_id = db.Column(db.Integer, db.ForeignKey('member.id'))
+    class_id = db.Column(db.Integer, db.ForeignKey('classes.id'))
 
 class Sessions(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -62,10 +68,13 @@ class Sessions(db.Model):
 class Equipment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(255))
-    maintenance_schedule = db.Column(db.DateTime)
+    last_maintained = db.Column(db.DateTime)
+    next_maintenance = db.Column(db.DateTime)
 
 class Bill(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     member_id = db.Column(db.Integer, db.ForeignKey('member.id'))
     amount = db.Column(db.Numeric(10, 2))
+    paid = db.Column(db.Boolean)
+    type = db.Column(db.String(255))
     date = db.Column(db.DateTime)

@@ -1,122 +1,132 @@
-{% extends 'base.html' %} 
-{% block title %} Home {% endblock %} 
-{% block content %}
-
-<h1>Profile Information</h1>
-<div class="row">
-  <!-- <div class="col-md-6">
-    <div class="profile">
-      <div class="profile">
-        <section>
-          <p>Name: {{ user.name }}</p>
-        </section>
-        <section>
-          <p>Profile Info: {{ user.profile_info }}</p>
-        </section>
-        <section>
-          <p>Fitness Goals: {{ user.fitness_goals }}</p>
-        </section>
-        <section>
-          <p>Health Metrics: {{ user.health_metrics }}</p>
-        </section>
-        <section>
-          <p>Height: {{ user.height }}</p>
-        </section>
-        <section>
-          <p>Weight: {{ user.weight }}</p>
-        </section>
-        <section>
-          <p>Goal Weight: {{ user.goal_weight }}</p>
-        </section>
-        <section>
-          <p>Goal Workouts Per Week: {{ user.goal_workouts_per_week }}</p>
-        </section>
-      </div>
-    </div>
-  </div> -->
-  <div class="col-md-6">
-    <div class="form">
-      <div class="form">
-        <form method="POST" action="/member_home/update_profile">
-          <label for="name">Name:</label>
-          <input type="text" id="name" name="name" value="{{ user.name }}">
-          <br>
-          <label for="profile_info">Profile Info:</label>
-          <input type="text" id="profile_info" name="profile_info" value="{{ user.profile_info }}">
-          <br>
-          <label for="fitness_goals">Fitness Goals:</label>
-          <input type="text" id="fitness_goals" name="fitness_goals" value="{{ user.fitness_goals }}">
-          <br>
-          <label for="health_metrics">Health Metrics:</label>
-          <input type="text" id="health_metrics" name="health_metrics" value="{{ user.health_metrics }}">
-          <br>
-          <label for="height">Height (cm):</label>
-          <input type="text" id="height" name="height" value="{{ user.height }}">
-          <br>
-          <label for="weight">Weight (kg):</label>
-          <input type="text" id="weight" name="weight" value="{{ user.weight }}">
-          <br>
-          <label for="goal_weight">Goal Weight:</label>
-          <input type="text" id="goal_weight" name="goal_weight" value="{{ user.goal_weight }}">
-          <br>
-          <label for="goal_workouts_per_week">Goal Workouts Per Week:</label>
-          <input type="text" id="goal_workouts_per_week" name="goal_workouts_per_week" value="{{ user.goal_workouts_per_week }}">
-          <input type="submit" value="Update Profile">
-        </form>
+{% extends 'base.html' %} {% block title %} Home {% endblock %} {% block content
+%}
+<h1 class="text-center">Dashboard</h1>
+<br />
+<div class="container">
+  <div class="row mt-5">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h2>Fitness Achievements</h2>
+        </div>
+        <div class="card-body">
+          <p class="card-text">
+            You have completed {{ routines|length }} workout routines in total.
+          </p>
+          <p class="card-text">
+            You have completed {{ workouts_in_last_week }}/{{
+            user.goal_workouts_per_week }} workouts this week.
+          </p>
+        </div>
       </div>
     </div>
   </div>
-</div>
-<h1>Dashboard</h1>
-<div class="row">
+  <div class="row mt-5">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h2>Health Statistics</h2>
+        </div>
+        <div class="card-body">
+          <p class="card-text">
+            You currently weigh {{ user.weight }} kgs which is {{
+            (user.weight-user.goal_weight)|abs }} kgs from your goal.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <h2>Routines</h2>
+      <form method="POST" action="{{ url_for('member.update_routine') }}">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Type</th>
+              <th scope="col">Date</th>
+              <th scope="col">Edit</th>
+              <th scope="col">Remove</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <input type="text" name="new_routine_type" />
+              </td>
+              <td>
+                <input type="date" name="new_routine_date" />
+              </td>
+              <td></td>
+              <td>
+                <button
+                  type="submit"
+                  formaction="{{ url_for('member.add_routine') }}"
+                  class="btn btn-success"
+                >
+                  Add
+                </button>
+              </td>
+            </tr>
+            {% for routine in routines %}
+            <tr>
+              <td>
+                <input
+                  type="text"
+                  name="routine_type"
+                  value="{{ routine.type }}"
+                />
+              </td>
+              <td>
+                <input
+                  type="date"
+                  name="routine_date"
+                  value="{{ routine.date }}"
+                />
+              </td>
+              <td>
+                <button
+                  type="submit"
+                  formaction="{{ url_for('member.update_routine', routine_id=routine.id) }}"
+                  class="btn btn-primary"
+                >
+                  Edit
+                </button>
+              </td>
+              <td>
+                <button
+                  type="submit"
+                  formaction="{{ url_for('member.delete_routine', routine_id=routine.id) }}"
+                  class="btn btn-danger"
+                >
+                  Remove
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </form>
+    </div>
+  </div>
 
-  <div class="col-md-6">
-    <h3> Available Trainers</h3>
-    <ul>
-      {% for availability in availabilities %}
-        <li>Trainer ID: {{ availability.trainer_id }}, Trainer Name: {{ availability.trainer_name }}, Available: {{ availability.available_start }} to {{ availability.available_end }}</li>
-      {% endfor %}
-  </div>
-  <div class="col-md-6">
-    <h3>Book a Session</h3>
-    <form method="POST" action="/member_home/book_session">
-      <label for="trainer_id">Trainer ID: </label>
-      <input type="text" id="trainer_id" name="trainer_id" value="">
-      <br>
-      <label for="date">Time:</label>
-      <input type="datetime-local" id="date" name="date">
-      <br>
-      <label for="credit_card_number">Credit Card Number:</label>
-      <input type="text" id="credit_card_number" name="credit_card_number">
-      <label for="amount"> Cost: $50</label>
-      <br>
-      <input type="submit" value="Purchase Session">
-    </form>
-  </div>
+  <script>
+    window.addEventListener(
+      "keydown",
+      function (e) {
+        if (
+          e.keyIdentifier == "U+000A" ||
+          e.keyIdentifier == "Enter" ||
+          e.keyCode == 13
+        ) {
+          if (e.target.nodeName == "INPUT" && e.target.type != "textarea") {
+            e.preventDefault();
+            return false;
+          }
+        }
+      },
+      true
+    );
+  </script>
+  {% endblock %}
 </div>
-<div class="row">
-
-  <div class="col-md-6">
-    <h3> Available Classes</h3>
-    {% for class in classes %}
-      <li>{{ class.name }} - Room: {{ class.room }}, Schedule: {{ class.schedule }}</li>
-    {% endfor %}
-  </div>
-  <div class="col-md-6">
-    <h3>Book a Class</h3>
-  </div>
-</div>
-<br>
-<div class="row">
-
-  <div class="col-md-6">
-    <h3> Booked Sessions</h3>
-    {% for session in sessions %}
-    <li>Trainer ID: {{ session.trainer_id }}, Trainer Name: {{ session.trainer_name }}, Start Time: {{ session.date_time}}</li>
-    {% endfor %}
-  </div>
-  <div class="col-md-6">
-    <h3>Booked Classes</h3>
-  </div>
-</div>
-{% endblock%}

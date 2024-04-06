@@ -1,0 +1,240 @@
+{% extends 'base.html' %} {% block title %} Home {% endblock %} {% block content
+%}
+
+<h1 class="text-center">Session and Class Scheduling</h1>
+<br />
+<div class="row">
+  <div class="col-md-6">
+    <h3>Available Trainers</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Trainer ID</th>
+          <th scope="col">Trainer Name</th>
+          <th scope="col">Available Start</th>
+          <th scope="col">Available End</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for availability in availabilities %}
+        <tr>
+          <td>{{ availability.trainer_id }}</td>
+          <td>{{ availability.trainer_name }}</td>
+          <td>{{ availability.available_start }}</td>
+          <td>{{ availability.available_end }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="col-md-6">
+    <h3>Purchase a Session</h3>
+    <div class="card">
+      <div class="card-body">
+        <form method="POST" action="/member_home/book_session">
+          <div class="form-group">
+            <label for="trainer_id">Trainer ID: </label>
+            <input
+              type="text"
+              id="trainer_id"
+              name="trainer_id"
+              class="form-control"
+            />
+          </div>
+          <div class="form-group">
+            <label for="session_date">Start Time:</label>
+            <input
+              type="datetime-local"
+              id="session_date"
+              name="session_date"
+              class="form-control"
+            />
+          </div>
+          <div class="form-group">
+            <label for="session_credit_card_number">Credit Card Number:</label>
+            <input
+              type="text"
+              id="session_credit_card_number"
+              name="session_credit_card_number"
+              class="form-control"
+            />
+          </div>
+          <div class="form-group">
+            <label for="amount">Cost: $50</label>
+          </div>
+          <button type="submit" class="btn btn-success">
+            Purchase Session
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<br />
+<div class="row">
+  <div class="col-md-6">
+    <h3>Available Classes</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Class Name</th>
+          <th scope="col">Room</th>
+          <th scope="col">Schedule</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for class in classes %}
+        <tr>
+          <td>{{ class.name }}</td>
+          <td>{{ class.room }}</td>
+          <td>{{ class.schedule }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="col-md-6">
+    <h3>Book a Class</h3>
+    <div class="card">
+      <div class="card-body">
+        <form method="POST" action="/member_home/book_class">
+          <div class="form-group">
+            <label for="class_name">Class Name: </label>
+            <input
+              type="text"
+              id="class_name"
+              name="class_name"
+              class="form-control"
+            />
+          </div>
+          <div class="form-group">
+            <label for="class_time">Class Time:</label>
+            <input
+              type="datetime-local"
+              id="class_time"
+              name="class_time"
+              class="form-control"
+            />
+          </div>
+          <div class="form-group">
+            <label for="class_credit_card_number">Credit Card Number:</label>
+            <input
+              type="text"
+              id="class_credit_card_number"
+              name="class_credit_card_number"
+              class="form-control"
+            />
+          </div>
+          <div class="form-group">
+            <label for="amount">Cost: $100</label>
+          </div>
+          <button type="submit" class="btn btn-success">Purchase Class</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<br />
+<div class="row">
+  <div class="col-md-12">
+    <h3>Booked Sessions</h3>
+    <form method="POST" action="{{ url_for('member.reschedule_session', original_session_id=session.id) }}">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Trainer ID</th>
+          <th scope="col">Trainer Name</th>
+          <th scope="col">Start Time</th>
+          <th scope="col">Reschedule</th>
+          <th scope="col">Deschedule</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for session in sessions %}
+        <tr>
+          <td>
+            <input
+              type="text"
+              name="session_trainer_id"
+              value="{{ session.trainer_id }}"
+            />
+          </td>
+          <td>
+            <input
+              type="text"
+              name="session_trainer_name"
+              value="{{ session.trainer_name }}"
+            />
+          </td>
+          <td>
+            <input
+              type="datetime-local"
+              name="session_date_time"
+              value="{{ session.date_time }}"
+            />
+          </td>
+          <td>
+              <button 
+              type="submit" 
+              class="btn btn-primary"
+              formaction="{{ url_for('member.reschedule_session', original_session_id=session.id) }}">
+                Reschedule Session
+              </button>
+          </td>
+          <td>
+              <button 
+              type="submit" 
+              class="btn btn-danger"
+              formaction="{{ url_for('member.delete_session', session_id=session.id) }}">
+                Deschedule Session
+              </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </form>
+  </div>
+  <div class="col-md-12">
+    <h3>Booked Classes</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Class Name</th>
+          <th scope="col">Room</th>
+          <th scope="col">Schedule</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for class in booked_classes %}
+        <tr>
+          <td>{{ class.name }}</td>
+          <td>{{ class.room }}</td>
+          <td>{{ class.schedule }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('member.delete_class') }}">
+              <input type="hidden" name="class_id" value="{{ class.id }}" />
+              <button type="submit" class="btn btn-danger">
+                Deschedule Class
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  window.addEventListener('keydown', function(e) {
+    if (e.keyIdentifier == 'U+000A' || e.keyIdentifier == 'Enter' || e.keyCode == 13) {
+      if (e.target.nodeName == 'INPUT' && e.target.type != 'textarea') {
+        e.preventDefault();
+        return false;
+      }
+    }
+  }, true);
+</script>
+{% endblock%}

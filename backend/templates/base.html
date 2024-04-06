@@ -35,6 +35,14 @@
           <li class="nav-item">
             <a class="nav-link" href="/">Home</a>
           </li>
+          {% if user.is_member %}
+          <li class="nav-item">
+            <a class="nav-link" href="/member_home/scheduling">Scheduling</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/member_home/profile">Profile</a>
+          </li>
+          {%endif%}
           <li class="nav-item">
             <a class="nav-link" href="/logout">Log Out</a>
           </li>

@@ -24,9 +24,16 @@ db.init_app(app)
 # Initialize routes
 from .views import views
 from .auth import auth
+from .member import member
+from .trainer import trainer
+from .admin import admin
+
 
 app.register_blueprint(views, url_prefix='/')
 app.register_blueprint(auth, url_prefix='/')
+app.register_blueprint(member, url_prefix='/')
+app.register_blueprint(trainer, url_prefix='/')
+app.register_blueprint(admin, url_prefix='/')
 
 
 # Initialize Login Manager

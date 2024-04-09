@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, UserMixin, current_user
+from dotenv import load_dotenv
+import os
 from flask_sqlalchemy import SQLAlchemy
 from .models import Member, Trainer, Admin
 from .database import db
@@ -9,13 +11,19 @@ from .database import db
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'comp3005'
 
+# Load environment variables
+load_dotenv()
+
 
 # Database information
-DATABASE = 'nek_project_v2'
-USER = 'postgres'
-PASSWORD = '1699'
-HOST = 'localhost'
-PORT = '5432'
+DATABASE = os.getenv('MYAPP_DATABASE')
+USER = os.getenv('MYAPP_USER')
+PASSWORD = os.getenv('MYAPP_PASSWORD')
+HOST = os.getenv('MYAPP_HOST')
+PORT = os.getenv('MYAPP_PORT')
+
+
+print(f'postgresql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}')
 
 app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}'
 db.init_app(app)

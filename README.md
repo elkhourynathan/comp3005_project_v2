@@ -32,6 +32,22 @@ Created by Nathan El-Khoury
 
 ### Relational Schema
 ![Relational Schema](/docs/v2_diagrams-Relational%20Schema.drawio.png)
+
+
+### Configuration
+
+Before running the application, you need to create a `.env` file in the root directory `/backend` of the project and add your PostgreSQL database credentials to it. Here's an example:
+
+```env
+MYAPP_DATABASE=your_database
+MYAPP_USER=your_username
+MYAPP_PASSWORD=your_password
+MYAPP_HOST=localhost
+MYAPP_PORT=5432
+```
+
+Additionally, you must run the DDL.sql and DML.sql to create and populate your postgres database. These can be found in the `/SQL` folder
+
 ### Installation
 Before you can run the application, you need to install the necessary requirements. You can do this by running the following command in your terminal. Ensure you are within the `/backend` directory in your terminal.
 

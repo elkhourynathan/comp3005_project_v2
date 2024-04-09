@@ -1,11 +1,14 @@
 from flask_sqlalchemy import SQLAlchemy
+from dotenv import load_dotenv
+import os
 
-# Database information
-DATABASE = 'nek_project_v1'
-USER = 'postgres'
-PASSWORD = '1699'
-HOST = 'localhost'
-PORT = '5432'
+load_dotenv()
+
+DATABASE = os.getenv('DATABASE')
+USER = os.getenv('USER')
+PASSWORD = os.getenv('PASSWORD')
+HOST = os.getenv('HOST')
+PORT = os.getenv('PORT')
 
 
 db = SQLAlchemy()

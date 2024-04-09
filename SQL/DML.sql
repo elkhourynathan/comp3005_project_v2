@@ -19,7 +19,7 @@ INSERT INTO Admin (username, password, name) VALUES
 INSERT INTO Availability (trainer_id, available_start, available_end, open) VALUES
 (1, '2024-04-01 09:00:00', '2024-04-01 10:00:00', False),
 (1, '2024-04-02 14:00:00', '2024-04-02 15:00:00', False),
-(2, '2024-04-01 08:00:00', '2024-04-01 09:00:00', True);
+(2, '2024-04-01 08:00:00', '2024-04-01 09:00:00', True),
 (1, '2024-04-01 06:00:00', '2024-04-01 07:00:00', False);
 
 
@@ -36,8 +36,8 @@ INSERT INTO Classes (availability_id, room_id, name) VALUES
 (1, 1,'Yoga Basics'),
 (2, 2,'Cycling Class');
 
--- Insert a Member_Class 
-INSERT INTO Member_Class (member_id, class_id) VALUES
+-- Insert a Member_Classes
+INSERT INTO Member_Classes (member_id, class_id) VALUES
 (1, 1);
 
 -- Inserting Equipment

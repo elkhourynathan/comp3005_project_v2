@@ -22,9 +22,6 @@ PASSWORD = os.getenv('MYAPP_PASSWORD')
 HOST = os.getenv('MYAPP_HOST')
 PORT = os.getenv('MYAPP_PORT')
 
-
-print(f'postgresql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}')
-
 app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}'
 db.init_app(app)
 

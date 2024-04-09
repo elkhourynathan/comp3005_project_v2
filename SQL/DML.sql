@@ -20,6 +20,12 @@ INSERT INTO Availability (trainer_id, available_start, available_end, open) VALU
 (1, '2024-04-01 09:00:00', '2024-04-01 10:00:00', False),
 (1, '2024-04-02 14:00:00', '2024-04-02 15:00:00', False),
 (2, '2024-04-01 08:00:00', '2024-04-01 09:00:00', True);
+(1, '2024-04-01 06:00:00', '2024-04-01 07:00:00', False);
+
+
+-- Inserting Sessions
+INSERT INTO Sessions (member_id, availability_id) VALUES
+(1,4);
 
 INSERT INTO Room (name) VALUES
 ('Room A'),
@@ -30,8 +36,11 @@ INSERT INTO Classes (availability_id, room_id, name) VALUES
 (1, 1,'Yoga Basics'),
 (2, 2,'Cycling Class');
 
+-- Insert a Member_Class 
+INSERT INTO Member_Class (member_id, class_id) VALUES
+(1, 1);
 
--- Inserting Equipment (Corrected to use last_maintained and next_maintenance)
+-- Inserting Equipment
 INSERT INTO Equipment (type, last_maintained, next_maintenance) VALUES
 ('Treadmill', '2024-05-01', '2024-06-01'),
 ('Rowing Machine', '2024-05-15', '2024-06-15'),

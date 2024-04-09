@@ -23,7 +23,7 @@ def trainer_home():
         Availability.available_end.label("available_end"),
         Trainer.name.label("trainer_name")
         ).join(Trainer, Availability.trainer_id == Trainer.id) \
-        .filter(Availability.trainer_id == current_user.id).all()
+        .filter(Availability.trainer_id == current_user.id, Availability.open == True).all()
     
     sessions = db.session.query(
         Sessions.id.label("id"),
@@ -72,7 +72,7 @@ def member_filter():
         Availability.available_end.label("available_end"),
         Trainer.name.label("trainer_name")
         ).join(Trainer, Availability.trainer_id == Trainer.id) \
-        .filter(Availability.trainer_id == current_user.id).all()
+        .filter(Availability.trainer_id == current_user.id, Availability.open == True).all()
     
     sessions = db.session.query(
         Sessions.id.label("id"),

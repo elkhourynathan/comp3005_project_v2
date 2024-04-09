@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2024-04-09T19:21:15.895Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.5 Chrome/114.0.5735.243 Electron/25.3.1 Safari/537.36" etag="PWR-PaE1d8FKKPxhReU0" version="21.6.5" type="device" pages="3">
+<mxfile host="Electron" modified="2024-04-09T19:21:23.086Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.5 Chrome/114.0.5735.243 Electron/25.3.1 Safari/537.36" etag="Mdw_tvMIwXUKF28bpJug" version="21.6.5" type="device" pages="3">
   <diagram name="Relational Schema" id="hG28JE-X-xJdluFglt5S">
     <mxGraphModel dx="1516" dy="391" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -410,6 +410,9 @@
         </mxCell>
         <mxCell id="bJ2Hw2XYMu5UoiXICymQ-5" value="Room" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontFamily=Helvetica;fontColor=default;" parent="1" vertex="1">
           <mxGeometry x="270" y="470" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="YdyRV3wU7uM0ZDKvmAC9-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0.604;exitY=0.014;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="KH4IyGDIZktf-V-J-w1Y-152" target="bJ2Hw2XYMu5UoiXICymQ-2">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

@@ -6,6 +6,8 @@ This was created for the final project of COMP3005 which is a Health and Fitness
 
 Created by Nathan El-Khoury
 
+Video Demo Link: https://youtu.be/HEGNmxlj7iQ
+
 ### File Structure
 
 - `backend/`: This directory contains all the backend code for the application, written in Flask.

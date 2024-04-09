@@ -5,21 +5,24 @@
   <div class="row">
     <h3>Availabilities</h3>
     <div class="col-12">
-      <form method="POST" action="{{ url_for('trainer.update_availability') }}">
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">Trainer ID</th>
-              <th scope="col">Trainer Name</th>
-              <th scope="col">Start Time</th>
-              <th scope="col">End Time</th>
-              <th scope="col">Edit</th>
-              <th scope="col">Remove</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for availability in availabilities %}
-            <tr>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Trainer ID</th>
+            <th scope="col">Trainer Name</th>
+            <th scope="col">Start Time</th>
+            <th scope="col">End Time</th>
+            <th scope="col">Edit</th>
+            <th scope="col">Remove</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for availability in availabilities %}
+          <tr>
+            <form
+              method="POST"
+              action="{{ url_for('trainer.update_availability', availability_id=availability.id) }}"
+            >
               <td>
                 <input
                   type="text"
@@ -48,6 +51,7 @@
                   type="datetime-local"
                   name="available_end"
                   value="{{ availability.available_end }}"
+                  readonly
                 />
               </td>
               <td>
@@ -68,9 +72,14 @@
                   Remove
                 </button>
               </td>
-            </tr>
-            {% endfor %}
-            <tr>
+            </form>
+          </tr>
+          {% endfor %}
+          <tr>
+            <form
+              method="POST"
+              action="{{ url_for('trainer.add_availability') }}"
+            >
               <td>
                 <input
                   type="text"
@@ -90,7 +99,7 @@
               <td>
                 <input type="datetime-local" name="new_available_start" />
               </td>
-              <td><input type="datetime-local" name="new_available_end" /></td>
+              <td></td>
               <td></td>
               <td>
                 <button
@@ -101,14 +110,14 @@
                   Add
                 </button>
               </td>
-            </tr>
-          </tbody>
-        </table>
-      </form>
+            </form>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <h3>Booked Sessions</h3>
     <div class="col-12">
-      <form method="POST" action="{{ url_for('trainer.update_availability') }}">
+      <form method="POST" action="{{ url_for('trainer.add_availability') }}">
         <table class="table">
           <thead>
             <tr>
@@ -123,21 +132,11 @@
           <tbody>
             {% for session in sessions %}
             <tr>
-              <td>
-                {{ session.trainer_id }}
-              </td>
-              <td>
-                {{ session.trainer_name }}
-              </td>
-              <td>
-                {{ session.member_id }}
-              </td>
-              <td>
-                {{ session.member_name }}
-              </td>
-              <td>
-                {{ session.date_time }}
-              </td>
+              <td>{{ session.trainer_id }}</td>
+              <td>{{ session.trainer_name }}</td>
+              <td>{{ session.member_id }}</td>
+              <td>{{ session.member_name }}</td>
+              <td>{{ session.date_time }}</td>
               <td>
                 <button
                   type="submit"
@@ -152,63 +151,101 @@
           </tbody>
         </table>
       </form>
-      <h3>Member Search</h3>
-      <div class="col-4">
-        <form
-          id="searchForm"
-          method="GET"
-          action="{{ url_for('trainer.member_filter') }}"
-        >
-          <div class="input-group">
-            <input
-              type="text"
-              id="search"
-              name="search"
-              class="form-control"
-              placeholder="Member Name"
-            />
-            <div class="input-group-append">
-              <button type="submit" class="btn btn-primary">Search</button>
-              <button type="submit" class="btn btn-danger" id="resetButton">
-                Reset
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
+      <h3>Classes to Lead</h3>
       <div class="col-12">
         <table class="table">
           <thead>
             <tr>
-              <th scope="col">Member ID</th>
-              <th scope="col">Member Name</th>
-              <th scope="col">Member Health Metrics</th>
-              <th scope="col">Member Goals</th>
-              <th scope="col">Member Height (cm)</th>
-              <th scope="col">Member Weight (kg)</th>
+              <th scope="col">Class Name</th>
+              <th scope="col">Room</th>
+              <th scope="col">Start Time</th>
+              <th scope="col">Cancel</th>
             </tr>
           </thead>
           <tbody>
-            {% for member in members %}
+            {% for class_ in classes %}
             <tr>
-              <td>{{ member.id }}</td>
-              <td>{{ member.name }}</td>
-              <td>{{ member.health_metrics }}</td>
-              <td>{{ member.fitness_goals }}</td>
-              <td>{{ member.height }}</td>
-              <td>{{ member.weight }}</td>
+              <form
+                method="POST"
+                action="{{ url_for('trainer.delete_class', class_id=class_.id) }}"
+              >
+                <td>{{ class_.name }}</td>
+                <td>{{ class_.room }}</td>
+                <td>{{ class_.start_time }}</td>
+                <td>
+                  <button
+                    type="submit"
+                    formaction="{{ url_for('trainer.delete_class', class_id=class_.id) }}"
+                    class="btn btn-danger"
+                  >
+                    Cancel
+                  </button>
+                </td>
+              </form>
             </tr>
             {% endfor %}
           </tbody>
         </table>
+        <h3>Member Search</h3>
+        <div class="col-4">
+          <form
+            id="searchForm"
+            method="GET"
+            action="{{ url_for('trainer.member_filter') }}"
+          >
+            <div class="input-group">
+              <input
+                type="text"
+                id="search"
+                name="search"
+                class="form-control"
+                placeholder="Member Name"
+              />
+              <div class="input-group-append">
+                <button type="submit" class="btn btn-primary">Search</button>
+                <button type="submit" class="btn btn-danger" id="resetButton">
+                  Reset
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="col-12">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Member ID</th>
+                <th scope="col">Member Name</th>
+                <th scope="col">Member Health Metrics</th>
+                <th scope="col">Member Goals</th>
+                <th scope="col">Member Height (cm)</th>
+                <th scope="col">Member Weight (kg)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for member in members %}
+              <tr>
+                <td>{{ member.id }}</td>
+                <td>{{ member.name }}</td>
+                <td>{{ member.health_metrics }}</td>
+                <td>{{ member.fitness_goals }}</td>
+                <td>{{ member.height }}</td>
+                <td>{{ member.weight }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
+  <script>
+    document
+      .getElementById("resetButton")
+      .addEventListener("click", function () {
+        document.getElementById("search").value = "";
+        document.getElementById("searchForm").submit();
+      });
+  </script>
+  {% endblock %}
 </div>
-<script>
-  document.getElementById("resetButton").addEventListener("click", function () {
-    document.getElementById("search").value = "";
-    document.getElementById("searchForm").submit();
-  });
-</script>
-{% endblock %}

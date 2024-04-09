@@ -9,7 +9,7 @@
     <table class="table">
       <thead>
         <tr>
-          <th scope="col">Trainer ID</th>
+          <th scope="col">Availability ID</th>
           <th scope="col">Trainer Name</th>
           <th scope="col">Available Start</th>
           <th scope="col">Available End</th>
@@ -18,7 +18,7 @@
       <tbody>
         {% for availability in availabilities %}
         <tr>
-          <td>{{ availability.trainer_id }}</td>
+          <td>{{ availability.id }}</td>
           <td>{{ availability.trainer_name }}</td>
           <td>{{ availability.available_start }}</td>
           <td>{{ availability.available_end }}</td>
@@ -33,20 +33,11 @@
       <div class="card-body">
         <form method="POST" action="/member_home/book_session">
           <div class="form-group">
-            <label for="trainer_id">Trainer ID: </label>
+            <label for="availability_id">Availability ID: </label>
             <input
               type="text"
-              id="trainer_id"
-              name="trainer_id"
-              class="form-control"
-            />
-          </div>
-          <div class="form-group">
-            <label for="session_date">Start Time:</label>
-            <input
-              type="datetime-local"
-              id="session_date"
-              name="session_date"
+              id="availability_id"
+              name="availability_id"
               class="form-control"
             />
           </div>
@@ -77,6 +68,7 @@
     <table class="table">
       <thead>
         <tr>
+          <th scope="col">Class ID</th>
           <th scope="col">Class Name</th>
           <th scope="col">Room</th>
           <th scope="col">Schedule</th>
@@ -85,9 +77,10 @@
       <tbody>
         {% for class in classes %}
         <tr>
+          <td>{{ class.id }}</td>
           <td>{{ class.name }}</td>
           <td>{{ class.room }}</td>
-          <td>{{ class.schedule }}</td>
+          <td>{{ class.start_time }}</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -99,20 +92,11 @@
       <div class="card-body">
         <form method="POST" action="/member_home/book_class">
           <div class="form-group">
-            <label for="class_name">Class Name: </label>
+            <label for="class_id">Class ID:</label>
             <input
               type="text"
-              id="class_name"
-              name="class_name"
-              class="form-control"
-            />
-          </div>
-          <div class="form-group">
-            <label for="class_time">Class Time:</label>
-            <input
-              type="datetime-local"
-              id="class_time"
-              name="class_time"
+              id="class_id"
+              name="class_id"
               class="form-control"
             />
           </div>
@@ -142,7 +126,6 @@
     <table class="table">
       <thead>
         <tr>
-          <th scope="col">Trainer ID</th>
           <th scope="col">Trainer Name</th>
           <th scope="col">Start Time</th>
           <th scope="col">Reschedule</th>
@@ -152,13 +135,6 @@
       <tbody>
         {% for session in sessions %}
         <tr>
-          <td>
-            <input
-              type="text"
-              name="session_trainer_id"
-              value="{{ session.trainer_id }}"
-            />
-          </td>
           <td>
             <input
               type="text"
@@ -211,7 +187,7 @@
         <tr>
           <td>{{ class.name }}</td>
           <td>{{ class.room }}</td>
-          <td>{{ class.schedule }}</td>
+          <td>{{ class.start_time }}</td>
           <td>
             <form method="POST" action="{{ url_for('member.delete_class') }}">
               <input type="hidden" name="class_id" value="{{ class.id }}" />

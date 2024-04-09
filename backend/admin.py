@@ -1,9 +1,8 @@
 from datetime import datetime, timedelta
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
-from functools import wraps
 from .database import db
-from .models import Member, Trainer, Admin, Availability, Classes, Sessions, Bill, MemberClasses,Routine, Equipment
+from .models import Member, Trainer, Availability, Classes, Bill, MemberClasses, Equipment, Room
 from .views import admin_required
 
 admin = Blueprint('admin', __name__)
@@ -15,40 +14,46 @@ admin = Blueprint('admin', __name__)
 @login_required
 @admin_required
 def admin_home():
-    # get all maintenances to view
     all_equipment = Equipment.query.all()
-    
-    # get all classes to view
-    classes = Classes.query.all()
-
-    # get all trainers to view
+    members = Member.query.all()
     trainers = Trainer.query.all()
+    rooms = Room.query.all()
+    bills = db.session.query(
+        Bill.id.label("id"),
+        Bill.member_id.label("member_id"),
+        Bill.amount.label("amount"),
+        Bill.date.label("date"),
+        Bill.paid.label("paid"),
+        Bill.type.label("type"),
+        Member.name.label("member_name")
+    ).join(Member, Bill.member_id == Member.id).all()
 
+    classes = db.session.query(
+        Classes.id.label("id"),
+        Classes.name.label("name"),
+        Room.name.label("room"),
+        Trainer.id.label("trainer_id"),
+        Trainer.name.label("trainer_name"),
+        Availability.available_start.label("schedule")
+    ).join(Availability, Classes.availability_id == Availability.id) \
+     .join(Room, Classes.room_id == Room.id) \
+     .join(Trainer, Availability.trainer_id == Trainer.id).all()
 
-    for class_ in classes:
-        trainer = Trainer.query.filter_by(id=class_.trainer_id).first()
-        class_.trainer_name = trainer.name
-
-    # Get all Bills
-    bills = Bill.query.all()
-
-    # Attach customer names via member_id
-    for bill in bills:
-        member = Member.query.filter_by(id=bill.member_id).first()
-        bill.member_name = member.name
-    
     # Sort all lists by id
     all_equipment.sort(key=lambda x: x.id)
     classes.sort(key=lambda x: x.id)
     trainers.sort(key=lambda x: x.id)
     bills.sort(key=lambda x: x.id)
+    rooms.sort(key=lambda x: x.id)
 
     return render_template("admin_home.html", 
                            user=current_user,
                             all_equipment=all_equipment,
                             classes=classes,
                             trainers=trainers,
-                            bills=bills)
+                            rooms=rooms,
+                            bills=bills,
+                            members=members)
 
 
 @admin.route('/admin_home/update_maintenace', methods=['POST'])
@@ -106,7 +111,8 @@ def delete_equipment(equipment_id):
 def add_equipment():
     equipment_type = request.form.get('new_type')
     last_maintained = datetime.now().strftime('%Y-%m-%d %H:%M')
-    next_maintenance = request.form.get('new_next_maintenance').strip().replace('T', ' ') + ':00'
+    next_maintenance = request.form.get('new_next_maintenance')
+    next_maintenance = datetime.strptime(next_maintenance, '%Y-%m-%dT%H:%M')
 
     if not equipment_type or not next_maintenance:
         flash('Please fill out all fields', category='error')
@@ -120,51 +126,88 @@ def add_equipment():
     return redirect(url_for('admin.admin_home'))
 
 
-@admin.route('/admin_home/update_class_schedule', methods=['POST'])
+@admin.route('/admin_home/update_class_schedule/<class_schedule_id>', methods=['POST'])
 @login_required
 @admin_required
-def update_class_schedule():
-    class_id = request.form.get('class_id')
-    trainer_id = request.form.get('trainer_id')
-
+def update_class_schedule(class_schedule_id):
+    class_id = class_schedule_id
+    trainer_id = int(request.form.get('trainer_id'))
     class_name = request.form.get('class_name')
-    class_room = request.form.get('class_room')
+    room_id = int(request.form.get('room_id'))
     schedule_from_form = request.form.get('class_schedule')
 
-    if not trainer_id or not class_name or not class_room or not schedule_from_form:
+    if not trainer_id or not class_name or not room_id or not schedule_from_form:
         flash('Please fill out all fields', category='error')
         return redirect(url_for('admin.admin_home'))
-
-    # Parse schedule after verifying one was entered
+    
     schedule = datetime.strptime(schedule_from_form.strip().replace('T', ' ') + ':00', '%Y-%m-%d %H:%M:%S')
 
-    # Query Sessions to check if trainer is available
-    sessions = Sessions.query.filter_by(trainer_id=trainer_id).all()
-    for session in sessions:
-        print(session.date_time, schedule)
-        if session.date_time == schedule:
-            flash('Trainer is not available at that time, has a conflicting session', category='error')
-            return redirect(url_for('admin.admin_home'))
-        
-    # Query Classes to see if room and trainer are available
-    classes = Classes.query.all()
-    for class_ in classes:
-        if class_.schedule == schedule and class_.room == class_room:
-            flash('Room is not available at that time', category='error')
-            return redirect(url_for('admin.admin_home'))
-        if class_.schedule == schedule and class_.trainer_id == int(trainer_id):
-            flash('Trainer is not available at that time, responsible for another class at this time', category='error')
-            return redirect(url_for('admin.admin_home'))
-
+    # Check if anything was changed
     class_ = Classes.query.get(class_id)
-    if class_:
-        class_.trainer_id = trainer_id
-        class_.name = class_name
-        class_.room = class_room
-        class_.schedule = schedule
-        db.session.commit()
+    original_availability = Availability.query.get(class_.availability_id)
+    original_trainer = Trainer.query.get(original_availability.trainer_id)
 
-    flash('Class schedule updated', category='success')
+
+    # print all the values and the truthy values
+    if (original_trainer.id == trainer_id
+        and class_.name == class_name 
+        and class_.room_id == room_id 
+        and original_availability.available_start == schedule):
+        flash('No changes were made', category='error')
+        return redirect(url_for('admin.admin_home'))
+
+    # Check room availability
+    other_classes = Classes.query.join(Availability).filter(
+        Classes.room_id == room_id,
+        Availability.available_start == schedule,
+        Classes.id != class_.id  # Exclude the current class from the check
+    ).first()
+    if other_classes:
+        flash('Room is already booked for another class at the given time.', category='error')
+        return redirect(url_for('admin.admin_home'))
+
+    # Check trainer time collisions
+    collision = Availability.query.filter(
+        Availability.trainer_id == trainer_id,
+        Availability.available_start <= schedule,
+        Availability.available_end >= schedule,
+        Availability.id != class_.availability_id,
+        Availability.open == False
+    ).first()
+
+    if collision:
+        flash('Trainer has a colliding availability.', category='error')
+        return redirect(url_for('admin.admin_home'))        
+
+    # If no collision, proceed to update or create availability
+    if original_availability.trainer_id != trainer_id or original_availability.available_start != schedule:
+        # Open the previous availability if it's not being used for another class
+        original_availability.open = True
+
+        # Check if trainer has a open availability at this time
+        open_availability = Availability.query.filter(
+            Availability.trainer_id == trainer_id,
+            Availability.available_start == schedule,
+            Availability.open == True
+        ).first()
+        if open_availability:
+            open_availability.open = False
+            class_.availability_id = open_availability.id
+        else:
+            # Create a new availability
+            new_availability = Availability(trainer_id=trainer_id, available_start=schedule, available_end=schedule + timedelta(hours=1), open=False)
+            db.session.add(new_availability)
+            db.session.flush() 
+
+            # Assign the new availability to the class
+            class_.availability_id = new_availability.id
+    
+    # Update class details
+    class_.name = class_name
+    class_.room_id = room_id
+
+    db.session.commit()
+    flash('Class schedule updated successfully.', category='success')
     return redirect(url_for('admin.admin_home'))
 
 
@@ -174,6 +217,8 @@ def update_class_schedule():
 def delete_class_schedule(class_schedule_id):
     class_ = Classes.query.get(class_schedule_id)
     if class_:
+        availability = Availability.query.get(class_.availability_id)
+        db.session.delete(availability)
         db.session.delete(class_)
         db.session.commit()
 
@@ -187,46 +232,64 @@ def delete_class_schedule(class_schedule_id):
     flash('Class schedule deleted', category='success')
     return redirect(url_for('admin.admin_home'))
 
+
 @admin.route('/admin_home/add_class_schedule', methods=['POST'])
 @login_required
 @admin_required
 def add_class_schedule():
+    trainer_id = int(request.form.get('new_trainer_id'))
     class_name = request.form.get('new_class_name')
-    room = request.form.get('new_room')
+    room_id = int(request.form.get('new_room'))
     schedule_from_form = request.form.get('new_schedule')
-    trainer_id = request.form.get('new_trainer_id')
 
-    if not class_name or not room or not schedule_from_form:
-        flash('Please fill out all fields', category='error')
+    if not trainer_id or not class_name or not room_id or not schedule_from_form:
+        flash('Please fill out all fields.', category='error')
         return redirect(url_for('admin.admin_home'))
     
-    # Parse schedule after verifying one was entered
+    # Convert the schedule from form input to a datetime object
     schedule = datetime.strptime(schedule_from_form.strip().replace('T', ' ') + ':00', '%Y-%m-%d %H:%M:%S')
-    
-    # Query Sessions to check if trainer is available
-    sessions = Sessions.query.filter_by(trainer_id=trainer_id).all()
-    for session in sessions:
-        print(session.date_time, schedule)
-        if session.date_time == schedule:
-            flash('Trainer is not available at that time, has a conflicting session', category='error')
-            return redirect(url_for('admin.admin_home'))
-        
-    # Query Classes to see if room and trainer are available
-    classes = Classes.query.all()
-    for class_ in classes:
-        if class_.schedule == schedule and class_.room == room:
-            flash('Room is not available at that time', category='error')
-            return redirect(url_for('admin.admin_home'))
-        if class_.schedule == schedule and class_.trainer_id == int(trainer_id):
-            flash('Trainer is not available at that time, responsible for another class at this time', category='error')
-            return redirect(url_for('admin.admin_home'))
 
-    print(trainer_id, class_name, room, schedule)
-    new_class = Classes(trainer_id=trainer_id, name=class_name, room=room, schedule=schedule)
+    # Check for trainer availability
+    collision = Availability.query.filter(
+        Availability.trainer_id == trainer_id,
+        Availability.available_start <= schedule,
+        Availability.available_end >= schedule,
+    ).first()
+    
+    if collision:
+        flash('Trainer has a colliding availability.', category='error')
+        return redirect(url_for('admin.admin_home'))
+
+    # Check for room availability
+    room_collision = Classes.query.join(Availability, Classes.availability_id == Availability.id).filter(
+        Classes.room_id == room_id,
+        Availability.available_start == schedule,
+    ).first()
+    
+    if room_collision:
+        flash('The selected room is already booked at the specified time.', category='error')
+        return redirect(url_for('admin.admin_home'))
+    
+    # If no collision, create a new availability
+    new_availability = Availability(
+        trainer_id=trainer_id, 
+        available_start=schedule, 
+        available_end=schedule + timedelta(hours=1), 
+        open=False  
+    )
+    db.session.add(new_availability)
+    db.session.flush()  
+
+    # Create a new class with the new availability
+    new_class = Classes(
+        name=class_name, 
+        room_id=room_id, 
+        availability_id=new_availability.id
+    )
     db.session.add(new_class)
     db.session.commit()
 
-    flash('Class schedule added', category='success')
+    flash('New class schedule added successfully.', category='success')
     return redirect(url_for('admin.admin_home'))
 
 @admin.route('/admin_home/pay_bill/<bill_id>', methods=['POST'])
@@ -246,7 +309,7 @@ def pay_bill(bill_id):
 @admin_required
 def add_bill():
     member_id = request.form.get('new_member_id')
-    member_name = request.form.get('new_member_name')
+    member_name = Member.query.get(member_id).name
     amount = request.form.get('new_amount')
     type = request.form.get('new_type')
     date = request.form.get('new_date')
@@ -268,4 +331,52 @@ def add_bill():
     db.session.commit()
 
     flash('Bill added', category='success')
+    return redirect(url_for('admin.admin_home'))
+
+
+@admin.route('/add_room', methods=['POST'])
+@login_required
+@admin_required
+def add_room():
+    new_room_name = request.form.get('new_room_name')
+    if not new_room_name:
+        flash('Room name cannot be empty.', 'error')
+        return redirect(url_for('admin.admin_home'))
+
+    new_room = Room(name=new_room_name)
+    db.session.add(new_room)
+    db.session.commit()
+    flash('Room added successfully.', 'success')
+    return redirect(url_for('admin.admin_home'))
+
+@admin.route('/update_room/<room_id>', methods=['POST'])
+@login_required
+@admin_required
+def update_room(room_id):
+    room = Room.query.get(room_id)
+    room_name = request.form.get(f'room_name_{room_id}')
+    
+    if not room_name:
+        flash('Room name cannot be empty.', 'error')
+        return redirect(url_for('admin.admin_home'))
+
+    room.name = room_name
+    db.session.commit()
+    flash('Room updated successfully.', 'success')
+    return redirect(url_for('admin.admin_home'))
+
+@admin.route('/delete_room/<room_id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_room(room_id):
+    room = Room.query.get(room_id)
+
+    classes = Classes.query.filter_by(room_id=room_id).all()
+    for class_ in classes:
+        delete_class_schedule(class_.id)
+    
+
+    db.session.delete(room)
+    db.session.commit()
+    flash('Room deleted successfully.', 'success')
     return redirect(url_for('admin.admin_home'))

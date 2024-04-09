@@ -5,23 +5,23 @@ block content %}
   <div class="row">
     <h3>Maintenance</h3>
     <div class="col-12">
-      <form method="POST" action="{{ url_for('admin.update_maintenance') }}">
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">Equipment ID</th>
-              <th scope="col">Type</th>
-              <th scope="col">Last Maintained</th>
-              <th scope="col">Next Maintenance</th>
-              <th scope="col">Maintain</th>
-              <th scope="col">Edit</th>
-              <th scope="col">Remove</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for equipment in all_equipment %}
-            <tr>
-              <td>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Equipment ID</th>
+            <th scope="col">Type</th>
+            <th scope="col">Last Maintained</th>
+            <th scope="col">Next Maintenance</th>
+            <th scope="col">Maintain</th>
+            <th scope="col">Edit</th>
+            <th scope="col">Remove</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for equipment in all_equipment %}
+          <tr>
+            <form method="POST" action="{{ url_for('admin.update_maintenance') }}">
+            <td>
                 <input
                   type="text"
                   name="equipment_id"
@@ -80,9 +80,11 @@ block content %}
                   Remove
                 </button>
               </td>
+            </form>
             </tr>
             {% endfor %}
             <tr>
+              <form method="POST" action="{{ url_for('admin.add_equipment') }}">
               <td>
                 <p></p>
               </td>
@@ -93,7 +95,7 @@ block content %}
                 <p></p>
               </td>
               <td>
-                <input type="date" name="new_next_maintenance" />
+                <input type="datetime-local" name="new_next_maintenance" />
               </td>
               <td>
                 <button
@@ -104,29 +106,29 @@ block content %}
                   Add
                 </button>
               </td>
+            </form>
             </tr>
           </tbody>
         </table>
-      </form>
     </div>
     <h3>Class Scheduling</h3>
     <div class="col-12">
-      <form method="POST" action="{{ url_for('admin.update_class_schedule') }}">
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">ID</th>
-              <th scope="col">Trainer Name</th>
-              <th scope="col">Name</th>
-              <th scope="col">Room</th>
-              <th scope="col">Schedule</th>
-              <th scope="col">Edit</th>
-              <th scope="col">Remove</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for class in classes %}
-            <tr>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Trainer Name</th>
+            <th scope="col">Name</th>
+            <th scope="col">Room</th>
+            <th scope="col">Schedule</th>
+            <th scope="col">Edit</th>
+            <th scope="col">Remove</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for class in classes %}
+          <tr>
+              <form method="POST" action="{{ url_for('admin.update_class_schedule', class_schedule_id=class.id) }}">
               <td>
                 <input
                   type="text"
@@ -140,16 +142,22 @@ block content %}
               <td>
                 <select name="trainer_id" class="form-control">
                   {% for trainer in trainers %}
-                  <option value="{{ trainer.id }}">{{ trainer.name }}</option>
+                  <option value="{{ trainer.id }}" {% if trainer.id == class.trainer_id %}selected{% endif %}>{{ trainer.name }}</option>
                   {% endfor %}
                 </select>
               </td>
+              
               <td>
                 <input type="text" name="class_name" value="{{ class.name }}" />
               </td>
               <td>
-                <input type="text" name="class_room" value="{{ class.room }}" />
+                <select name="room_id" class="form-control">
+                  {% for room in rooms %}
+                  <option value="{{ room.id }}" {% if room.name == class.room %}selected{% endif %}>{{ room.name }}</option>
+                  {% endfor %}
+                </select>
               </td>
+              
               <td>
                 <input
                   type="datetime-local"
@@ -175,9 +183,11 @@ block content %}
                   Remove
                 </button>
               </td>
+              </form>
             </tr>
             {% endfor %}
             <tr>
+              <form method="POST" action="{{ url_for('admin.add_class_schedule') }}">
               <td></td>
               <td>
                 <select name="new_trainer_id" class="form-control">
@@ -189,7 +199,11 @@ block content %}
                 <input type="text" name="new_class_name" />
               </td>
               <td>
-                <input type="text" name="new_room" />
+                <select name="new_room" class="form-control">
+                  {% for room in rooms %}
+                  <option value="{{ room.id }}" >{{ room.name }}</option>
+                  {% endfor %}
+                </select>
               </td>
               <td>
                 <input type="datetime-local" name="new_schedule" />
@@ -203,11 +217,50 @@ block content %}
                   Add
                 </button>
               </td>
+            </form>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+    <h3>Room Management</h3>
+    <div class="col-12">
+      <form method="POST" action="{{ url_for('admin.add_room') }}">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Room ID</th>
+              <th scope="col">Room Name</th>
+              <th scope="col">Edit</th>
+              <th scope="col">Remove</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for room in rooms %}
+            <tr>
+              <td>{{ room.id }}</td>
+              <td>
+                <input type="text" name="room_name_{{ room.id }}" value="{{ room.name }}" />
+              </td>
+              <td>
+                <button type="submit" formaction="{{ url_for('admin.update_room', room_id=room.id) }}" class="btn btn-primary">Edit</button>
+              </td>
+              <td>
+                <button type="submit" formaction="{{ url_for('admin.delete_room', room_id=room.id) }}" class="btn btn-danger">Remove</button>
+              </td>
+            </tr>
+            {% endfor %}
+            <tr>
+              <td></td>
+              <td><input type="text" name="new_room_name" placeholder="Enter new room name" /></td>
+              <td colspan="2">
+                <button type="submit" class="btn btn-success">Add Room</button>
+              </td>
             </tr>
           </tbody>
         </table>
       </form>
     </div>
+
     <h3>Billing</h3>
     <div class="col-12">
       <form method="POST" action="{{ url_for('admin.add_bill') }}">
@@ -226,11 +279,13 @@ block content %}
         <tbody>
           <tr>
             <td>
-              <input type="text" name="new_member_id" placeholder="Member ID" />
             </td>
             <td>
-              <input type="text" name="new_member_name" placeholder="Member Name" />
-            </td>
+            <select name="new_member_id" class="form-control">
+              {% for member in members %}
+              <option value="{{ member.id }}">{{ member.name }}</option>
+              {% endfor %}
+            </select>
             <td>
               <input type="number" name="new_amount" placeholder="Amount" />
             </td>

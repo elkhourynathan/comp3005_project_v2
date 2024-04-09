@@ -39,37 +39,39 @@
   <div class="row">
     <div class="col-md-12">
       <h2>Routines</h2>
-      <form method="POST" action="{{ url_for('member.update_routine') }}">
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">Type</th>
-              <th scope="col">Date</th>
-              <th scope="col">Edit</th>
-              <th scope="col">Remove</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <input type="text" name="new_routine_type" />
-              </td>
-              <td>
-                <input type="date" name="new_routine_date" />
-              </td>
-              <td></td>
-              <td>
-                <button
-                  type="submit"
-                  formaction="{{ url_for('member.add_routine') }}"
-                  class="btn btn-success"
-                >
-                  Add
-                </button>
-              </td>
-            </tr>
-            {% for routine in routines %}
-            <tr>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Type</th>
+            <th scope="col">Date</th>
+            <th scope="col">Edit</th>
+            <th scope="col">Remove</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <form method="POST" action="{{ url_for('member.add_routine') }}">
+            <td>
+              <input type="text" name="new_routine_type" />
+            </td>
+            <td>
+              <input type="date" name="new_routine_date" />
+            </td>
+            <td></td>
+            <td>
+              <button
+              type="submit"
+              formaction="{{ url_for('member.add_routine') }}"
+              class="btn btn-success"
+              >
+              Add
+            </button>
+          </td>
+        </form>
+        </tr>
+        {% for routine in routines %}
+        <tr>
+              <form method="POST" action="{{ url_for('member.update_routine', routine_id=routine.id) }}">
               <td>
                 <input
                   type="text"
@@ -102,11 +104,11 @@
                   Remove
                 </button>
               </td>
+            </form>
             </tr>
             {% endfor %}
           </tbody>
         </table>
-      </form>
     </div>
   </div>
 

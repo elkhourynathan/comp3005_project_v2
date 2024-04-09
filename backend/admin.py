@@ -313,7 +313,8 @@ def add_bill():
     amount = request.form.get('new_amount')
     type = request.form.get('new_type')
     date = request.form.get('new_date')
-    paid = True if request.form.get('new_paid') == 'True' else False
+    print(request.form.get('new_paid'))
+    paid = True if request.form.get('new_paid') == 'on' else False
 
     if not member_id or not member_name or not amount or not type or not date:
         flash('Please fill out all fields', category='error')

@@ -1,4 +1,4 @@
-# COMP 3005 - Project V2 
+# Health and Fitness Club Management System
 
 #### About
 
